@@ -6,15 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:api": "openapi-generator-cli generate -i api/swagger.json -g typescript-axios -o src/api/generated --skip-validate-spec --additional-properties=supportsES6=true"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.6.0",
+    "axios": "^1.8.0",
     "bootstrap": "^5.3.3",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.9",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.20.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

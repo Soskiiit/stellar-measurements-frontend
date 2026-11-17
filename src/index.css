@@ -283,6 +283,7 @@ body {
 }
 
 .tile-card-image {
+  position: relative;
   width: 100%;
   height: 160px;
   overflow: hidden;
@@ -542,4 +543,349 @@ body {
   font-weight: 700;
   color: var(--color-beige);
   white-space: nowrap;
+}
+
+/* Header: текущий пользователь */
+.header-user {
+  margin-left: auto;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-beige);
+  letter-spacing: 0.5px;
+}
+
+/* Блокирующая анимация загрузки */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  background: rgba(20, 8, 2, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 42px;
+  height: 42px;
+}
+
+.loading-text {
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-beige);
+  letter-spacing: 1px;
+}
+
+/* Страница авторизации */
+.auth-page {
+  min-height: calc(100vh - 104px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--color-primary);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.auth-header {
+  font-family: var(--font-main);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-brown);
+  margin-bottom: 14px;
+}
+
+.auth-error {
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
+.auth-field {
+  margin-bottom: 12px;
+}
+
+.auth-label {
+  font-family: var(--font-main);
+  font-size: 12px;
+  color: var(--color-text-label);
+  margin-bottom: 4px;
+}
+
+.auth-input {
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius);
+  font-family: var(--font-main);
+  font-size: 13px;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px;
+  background-color: #841;
+  background-image: linear-gradient(#b52 15%, #841 80%, #630);
+  border: solid 1px #500;
+  border-radius: 2pt;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+  color: #fff;
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+}
+
+.auth-submit-btn:hover {
+  background: #a62;
+}
+
+.auth-submit-btn:active {
+  background: #b30;
+  transform: translateY(1px);
+}
+
+.auth-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 12px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-brown);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-hint {
+  margin-top: 12px;
+  font-family: var(--font-main);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Страница добавления звезды (два шага) */
+.add-page {
+  min-height: calc(100vh - 104px);
+}
+
+.add-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 20px;
+}
+
+.add-header {
+  font-family: var(--font-main);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-brown);
+  margin-bottom: 14px;
+}
+
+.add-section {
+  margin-bottom: 16px;
+}
+
+.add-section-title {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-brown);
+  margin-bottom: 8px;
+}
+
+.add-media-stack {
+  display: flex;
+  gap: 12px;
+}
+
+.add-media-strip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  padding: 10px;
+  background: var(--color-primary);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.add-media-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.add-media-label {
+  font-family: var(--font-main);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.add-field {
+  margin-bottom: 12px;
+}
+
+.add-label {
+  font-family: var(--font-main);
+  font-size: 12px;
+  color: var(--color-text-label);
+  margin-bottom: 4px;
+}
+
+.add-input,
+.add-textarea {
+  width: 100%;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-family: var(--font-main);
+  font-size: 13px;
+  background: var(--color-input-bg);
+}
+
+.add-textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.add-submit-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #841;
+  background-image: linear-gradient(#b52 15%, #841 80%, #630);
+  border: solid 1px #500;
+  border-radius: 2pt;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4), 1px 1px 2px 0 rgba(255, 255, 255, 0.5) inset;
+  color: #fff;
+  cursor: pointer;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 9pt;
+}
+
+.add-submit-btn:hover {
+  background: #a62;
+}
+
+.add-submit-btn:active {
+  background: #b30;
+  transform: translateY(1px);
+}
+
+/* Кнопка удаления на карточке каталога */
+.tile-card-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 8, 2, 0.65);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.2s;
+}
+
+.tile-card-delete-btn:hover {
+  background: #a00;
+}
+
+/* Кнопка лайка в ленте */
+.feed-like-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.feed-like-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.feed-like-btn.liked .feed-like-icon {
+  color: #ff6b6b;
+}
+
+/* Примечание о mock-данных */
+.tile-mock-note {
+  font-family: var(--font-main);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: #fff7ec;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  margin-bottom: 12px;
+}
+
+.feed-mock-note {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 30;
+  font-family: var(--font-main);
+  font-size: 10px;
+  color: #fff;
+  background: rgba(20, 8, 2, 0.6);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+}
+
+/* Пустая лента / ошибка */
+.feed-empty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  color: var(--color-primary);
+  font-family: var(--font-main);
+  font-size: 13px;
 }

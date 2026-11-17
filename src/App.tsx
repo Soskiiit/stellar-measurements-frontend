@@ -1,39 +1,52 @@
-import React, { useState, useMemo } from 'react';
-import { mockParallaxStars } from './data/mockParallaxStars';
+import React, { useState } from 'react';
 import { ActiveTab, NavigationBar } from './components/NavigationBar';
 import { ParallaxStarsCatalogPage } from './components/ParallaxStarsCatalogPage';
 import { ParallaxStarsFeedPage } from './components/ParallaxStarsFeedPage';
+import { AddStarPage } from './components/AddStarPage';
+import { AuthPage } from './components/AuthPage';
+import { LoadingOverlay } from './components/LoadingOverlay';
+import { selectIsAuthenticated } from './store/authSlice';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import {
+  fetchParallaxStarFeed,
+  fetchParallaxStarsCatalog,
+} from './store/parallaxStarsSlice';
 
 export const App: React.FC = () => {
-  // Навигация между доступными вкладками гостя: лента и каталог (плитка)
+  const dispatch = useAppDispatch();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const userLogin = useAppSelector((state) => state.auth.user?.login);
+  const distance = useAppSelector((state) => state.filter.distance);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('catalog');
 
-  // Список только опубликованных звёзд для гостя
-  const publishedStars = useMemo(() => {
-    return mockParallaxStars.filter((s) => s.status === 'published');
-  }, []);
-
-  // Выбранная звезда для отображения в ленте
-  const [currentStarId, setCurrentStarId] = useState<number>(() => {
-    return publishedStars[0]?.id ?? 1;
-  });
-
-  const currentStar = useMemo(() => {
-    return publishedStars.find((s) => s.id === currentStarId) || publishedStars[0];
-  }, [publishedStars, currentStarId]);
+  // Гость не может попасть на добавление; после входа страница авторизации
+  // больше не нужна — показываем каталог.
+  const effectiveTab: ActiveTab =
+    activeTab === 'add' && !isAuthenticated
+      ? 'auth'
+      : activeTab === 'auth' && isAuthenticated
+        ? 'catalog'
+        : activeTab;
 
   // Переход к ленте при клике на карточку в плитке
   const handleSelectStar = (starId: number) => {
-    setCurrentStarId(starId);
+    dispatch(fetchParallaxStarFeed({ id: starId }));
     setActiveTab('feed');
   };
 
-  // Переход к следующей звезде в ленте (циклический переход)
-  const handleNextStar = () => {
-    if (publishedStars.length === 0) return;
-    const currentIndex = publishedStars.findIndex((s) => s.id === currentStar.id);
-    const nextIndex = (currentIndex + 1) % publishedStars.length;
-    setCurrentStarId(publishedStars[nextIndex].id);
+  // После входа перезапрашиваем каталог и ленту с JWT-кукой:
+  // появляются признаки is_creator / is_liked
+  const handleAuthorized = () => {
+    dispatch(fetchParallaxStarsCatalog(distance ?? undefined));
+    dispatch(fetchParallaxStarFeed({}));
+    setActiveTab('catalog');
+  };
+
+  // После публикации черновика обновляем каталог
+  const handlePublished = () => {
+    dispatch(fetchParallaxStarsCatalog(distance ?? undefined));
+    setActiveTab('catalog');
   };
 
   return (
@@ -47,26 +60,32 @@ export const App: React.FC = () => {
         >
           ⭗ StarParallax
         </button>
+        {isAuthenticated && userLogin && (
+          <span className="header-user" title="Текущий пользователь">
+            {userLogin}
+          </span>
+        )}
       </header>
 
       {/* Контент активной страницы */}
       <main className="app-main">
-        {activeTab === 'catalog' && (
-          <ParallaxStarsCatalogPage
-            stars={mockParallaxStars}
-            onSelectStar={handleSelectStar}
-          />
+        {effectiveTab === 'catalog' && (
+          <ParallaxStarsCatalogPage onSelectStar={handleSelectStar} />
         )}
-        {activeTab === 'feed' && currentStar && (
-          <ParallaxStarsFeedPage
-            currentStar={currentStar}
-            onNextStar={handleNextStar}
-          />
+        {effectiveTab === 'feed' && <ParallaxStarsFeedPage />}
+        {effectiveTab === 'add' && isAuthenticated && (
+          <AddStarPage onPublished={handlePublished} />
+        )}
+        {effectiveTab === 'auth' && !isAuthenticated && (
+          <AuthPage onAuthorized={handleAuthorized} />
         )}
       </main>
 
       {/* Нижняя навигационная панель navbar из 4 пунктов */}
-      <NavigationBar activeTab={activeTab} onTabChange={(tab) => setActiveTab(tab)} />
+      <NavigationBar activeTab={effectiveTab} onTabChange={setActiveTab} />
+
+      {/* Блокирующая анимация на время AJAX-запросов */}
+      <LoadingOverlay />
     </div>
   );
 };

@@ -1,61 +1,86 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect } from 'react';
+import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
-import { ParallaxStar } from '../types/parallaxStar';
+import { selectIsAuthenticated } from '../store/authSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  deleteParallaxStar,
+  fetchParallaxStarsCatalog,
+} from '../store/parallaxStarsSlice';
 import { ParallaxStarFilter } from './ParallaxStarFilter';
 import { ParallaxStarCard } from './ParallaxStarCard';
 
 interface ParallaxStarsCatalogPageProps {
-  stars: ParallaxStar[];
   onSelectStar: (starId: number) => void;
 }
 
 export const ParallaxStarsCatalogPage: React.FC<ParallaxStarsCatalogPageProps> = ({
-  stars,
   onSelectStar,
 }) => {
-  // Фильтруем только опубликованные звёзды (черновики и удаленные гость не видит)
-  const publishedStars = useMemo(() => {
-    return stars.filter((star) => star.status === 'published');
-  }, [stars]);
+  const dispatch = useAppDispatch();
+  const catalog = useAppSelector((state) => state.parallaxStars.catalog);
+  const distance = useAppSelector((state) => state.filter.distance);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const mutationError = useAppSelector((state) => state.parallaxStars.mutation.error);
 
-  // Максимальное расстояние для слайдера
-  const maxDistanceAvailable = useMemo(() => {
-    if (publishedStars.length === 0) return 1000;
-    const max = Math.max(...publishedStars.map((s) => s.distance));
-    return Math.max(1000, Math.ceil(max));
-  }, [publishedStars]);
+  useEffect(() => {
+    if (catalog.status === 'idle') {
+      dispatch(fetchParallaxStarsCatalog(distance ?? undefined));
+    }
+  }, []);
 
-  // Состояние применённого фильтра по расстоянию (по умолчанию показываем все)
-  const [appliedMaxDistance, setAppliedMaxDistance] = useState<number>(maxDistanceAvailable);
-
-  // Список звёзд после фильтрации
-  const filteredStars = useMemo(() => {
-    return publishedStars.filter((star) => star.distance <= appliedMaxDistance);
-  }, [publishedStars, appliedMaxDistance]);
+  const handleDelete = (starId: number) => {
+    dispatch(deleteParallaxStar(starId));
+  };
 
   return (
     <div className="tile-page">
       <Container className="tile-container">
         <h1 className="tile-header">Каталог звёзд</h1>
 
-        {/* Компонент фильтрации по предметной области (расстояние в парсеках) */}
-        <ParallaxStarFilter
-          maxDistance={maxDistanceAvailable}
-          initialValue={appliedMaxDistance}
-          onFilterChange={(val) => setAppliedMaxDistance(val)}
-        />
+        {/* Фильтр по расстоянию из Redux; уходит в запрос ?distance=... */}
+        <ParallaxStarFilter />
 
-        {/* Сетка карточек в 2 колонки */}
-        {filteredStars.length > 0 ? (
+        {catalog.source === 'mock' && (
+          <div className="tile-mock-note">
+            Бэкенд недоступен — показаны mock-данные (режим гостя)
+          </div>
+        )}
+
+        {mutationError && <Alert variant="danger">{mutationError}</Alert>}
+
+        {catalog.status === 'failed' ? (
+          <Alert variant="danger">
+            {catalog.error}
+            <div className="mt-2">
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() => dispatch(fetchParallaxStarsCatalog(distance ?? undefined))}
+              >
+                Повторить
+              </Button>
+            </div>
+          </Alert>
+        ) : catalog.items.length > 0 ? (
           <div className="tile-grid">
-            {filteredStars.map((star) => (
-              <ParallaxStarCard key={star.id} star={star} onSelect={onSelectStar} />
+            {catalog.items.map((star) => (
+              <ParallaxStarCard
+                key={star.id}
+                star={star}
+                onSelect={onSelectStar}
+                canDelete={isAuthenticated && star.is_creator === 1}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--color-text-muted)' }}>
-            Звёзды не найдены по заданному критерию
-          </div>
+          catalog.status === 'succeeded' && (
+            <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--color-text-muted)' }}>
+              Звёзды не найдены по заданному критерию
+            </div>
+          )
         )}
       </Container>
     </div>

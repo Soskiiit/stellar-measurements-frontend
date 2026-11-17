@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import { setDistanceFilter } from '../store/filterSlice';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { fetchParallaxStarsCatalog } from '../store/parallaxStarsSlice';
 
-interface ParallaxStarFilterProps {
-  maxDistance: number;
-  initialValue: number;
-  onFilterChange: (selectedMaxDistance: number) => void;
-}
+const MAX_DISTANCE = 1000;
 
-export const ParallaxStarFilter: React.FC<ParallaxStarFilterProps> = ({
-  maxDistance,
-  initialValue,
-  onFilterChange,
-}) => {
-  const [sliderValue, setSliderValue] = useState<number>(initialValue);
+// Фильтр по расстоянию: значение хранится в Redux (filterSlice),
+// по кнопке «Поиск» уходит в запрос к бэкенду (?distance=...).
+export const ParallaxStarFilter: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const distance = useAppSelector((state) => state.filter.distance);
+  const sliderValue = distance ?? MAX_DISTANCE;
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSliderValue(Number(e.target.value));
+    dispatch(setDistanceFilter(Number(e.target.value)));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onFilterChange(sliderValue);
+    dispatch(fetchParallaxStarsCatalog(sliderValue));
   };
 
   return (
@@ -35,7 +34,7 @@ export const ParallaxStarFilter: React.FC<ParallaxStarFilterProps> = ({
           <Form.Range
             id="distance-range"
             min={0}
-            max={maxDistance}
+            max={MAX_DISTANCE}
             step={1}
             value={sliderValue}
             onChange={handleSliderChange}
@@ -43,7 +42,7 @@ export const ParallaxStarFilter: React.FC<ParallaxStarFilterProps> = ({
           />
           <div className="tile-slider-ticks">
             <span>0 пк</span>
-            <span>{maxDistance} пк</span>
+            <span>{MAX_DISTANCE} пк</span>
           </div>
         </div>
       </div>
