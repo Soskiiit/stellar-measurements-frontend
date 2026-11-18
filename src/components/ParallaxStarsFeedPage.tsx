@@ -60,7 +60,9 @@ export const ParallaxStarsFeedPage: React.FC = () => {
     ? defaultStarVideo
     : toS3ProxyUrl(star.video_url) || defaultStarVideo;
   const posterSrc = toS3ProxyUrl(star.image_url) || defaultStarPoster;
-  const isLiked = star.is_liked === 1;
+  // После F5 JWT-кука жива, и сервер отдаёт is_liked для неё,
+  // но гостевой интерфейс персональный лайк не показывает.
+  const isLiked = isAuthenticated && star.is_liked === 1;
 
   const handleVideoError = () => {
     if (!videoFailed) setVideoFailed(true);
